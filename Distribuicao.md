@@ -1,4 +1,4 @@
-# Pessoa 1 – Modelo de Dados
+# Maria Clara Pessoa 1 – Modelo de Dados
 
 Pacote: common.model
 Responsabilidades:
