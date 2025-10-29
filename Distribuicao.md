@@ -11,7 +11,7 @@ Responsabilidades:
     Objetivo final: fornecer objetos para trafegar pela rede.
 
 
-# Pessoa 2 – Protocolo de Comunicação
+# Ana Vitória (Pessoa 2) – Protocolo de Comunicação
 
 Pacote: common.net
 Responsabilidades:
