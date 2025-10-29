@@ -1,4 +1,4 @@
-# Maria Clara Pessoa 1 – Modelo de Dados
+# Maria Clara (Pessoa 1) – Modelo de Dados
 
 Pacote: common.model
 Responsabilidades:
@@ -22,7 +22,7 @@ Responsabilidades:
     Objetivo final: padronizar como servidor e cliente trocam mensagens.
 
 
-# Pessoa 3 – Core do Servidor
+# Yuu (Pessoa 3) – Core do Servidor
 
 Pacote: server.core
 Responsabilidades:
