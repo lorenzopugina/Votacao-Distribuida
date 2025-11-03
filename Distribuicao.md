@@ -33,7 +33,7 @@ Responsabilidades:
     Objetivo final: lógica principal da votação.
 
 
-# Pessoa 4 – Threads e Conexão do Servidor
+# Lorenzo (Pessoa 4) – Threads e Conexão do Servidor
 
 Pacote: server.net
 Responsabilidades:

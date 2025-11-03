@@ -53,14 +53,12 @@ Cliente
     ClientConnection envia/recebe objetos Message (Faz a conexão TCP com o servidor, envia e recebe objetos Message)
 
 servidor 
-
     ServerMain inicia o servidor, abre porta TCP
     ClientHandler: thread que atende cada cliente individualmente
-    ElectionManager: regra de negócio do servidor: armazena eleição, valida CPF, registra votos, impede duplicidade
+    ElectionManager: regra de negócio do servidor: armazena eleição, registra votos, impede duplicidade e valida CPF(com a ajuda do CPFValidator)
     ServerGUI moostra resultados em tempo real e opções de controle (iniciar, encerrar, visualizar votos)
 
 geral
-
     O servidor inicia (ServerMain) e cria eleição no ElectionManager
     O cliente inicia (ClientMain) e abre GUI (ClientGUI)
     ClientGUI chama ClientConnection.connect()
