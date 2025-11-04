@@ -52,6 +52,7 @@ Responsabilidades:
 ClientMain: inicia GUI
 ClientConnection: gerencia conexão TCP, envia e recebe Message
 ClientGUI: interface gráfica com tela de CPF + opções de voto
+Janelas/Diálogo de "Ajuda" e "Créditos"
 Objetivo final: permitir ao usuário votar de forma simples.
 
 
