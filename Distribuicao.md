@@ -44,7 +44,7 @@ Responsabilidades:
     Objetivo final: permitir múltiplos clientes simultâneos.
 
 
-# Pessoa 5 – Cliente (Conexão e UI)
+#Adriano  (Pessoa 5) – Cliente (Conexão e UI)
 
 Pacotes: client.net, client.ui
 Responsabilidades:
