@@ -1,13 +1,11 @@
 package common.net;
 
 public enum NetCommand {
-    REQUEST_ELECTION,   // client -> server
-    SEND_ELECTION,      // server -> client
+    REQUEST_ELECTION,   
+    SEND_ELECTION,      
 
-    SEND_VOTE,          // client -> server (e server -> client resposta)
+    SEND_VOTE,          
     
-    DISCONNECT,         // client -> server
-    ERROR               // ambos
+    DISCONNECT,         
+    ERROR               
 }
-
-// Será usado dentro de Message e por outras classes de rede

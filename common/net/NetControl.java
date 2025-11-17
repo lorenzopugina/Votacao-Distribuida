@@ -14,7 +14,6 @@ public class NetControl {
         try {
             this.socket = new Socket(host, port);
 
-            // Ordem obrigatória: OUT primeiro
             this.out = new ObjectOutputStream(socket.getOutputStream());
             this.out.flush();
 

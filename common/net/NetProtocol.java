@@ -5,13 +5,12 @@ import java.io.*;
 
 public class NetProtocol {
 
-    // envia mensagem pelo ObjectOutputStream
     public static boolean send(ObjectOutputStream out, Message msg) {
         try {
             synchronized (out) {
                 out.writeObject(msg);
                 out.flush();
-                out.reset(); // evita cache de objetos
+                out.reset(); 
             }
             return true;
         } catch (IOException e) {
@@ -41,7 +40,6 @@ public class NetProtocol {
         }
     }
 
-    // helper para criar mensagens sem repetição
     public static Message build(NetCommand cmd, Object payload, boolean ok, String text) {
         return new Message(cmd, payload, ok, text);
     }
