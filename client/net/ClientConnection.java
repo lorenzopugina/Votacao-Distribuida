@@ -1,6 +1,7 @@
 package client.net;
 
 import common.model.Message;
+import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
@@ -14,8 +15,8 @@ import java.net.Socket;
  */
 public class ClientConnection {
 
-    private String serverAddress;
-    private int serverPort;
+    private final String serverAddress;
+    private final int serverPort;
 
     private Socket socket;
     private ObjectOutputStream out;
@@ -31,41 +32,66 @@ public class ClientConnection {
         Estabelece a conexão com o servidor
         Cria o socket e os streams de objeto
     */
-    public void connect() {
-        // TODO:
+    public void connect() throws IOException {
         // 1. Criar o socket: new Socket(serverAddress, serverPort)
+        socket = new Socket(serverAddress, serverPort);
+        
         // 2. Criar ObjectOutputStream e ObjectInputStream
-        // 3. Lidar com IOException
+        // IMPORTANTE: O ObjectOutputStream DEVE ser criado primeiro para evitar deadlock
+        out = new ObjectOutputStream(socket.getOutputStream());
+        in = new ObjectInputStream(socket.getInputStream());
+        
+        // 3. Lidar com IOException (lançada pelo método)
     }
 
     //Envia uma Message ao servidor
-    public void send(Message msg) {
-        // TODO:
+    public void send(Message msg) throws IOException {
         // usar out.writeObject(msg) e out.flush()
-        // capturar IOException
+        if (out != null) {
+            out.writeObject(msg);
+            out.flush();
+        } else {
+            throw new IOException("Output stream is not initialized. Connection may be closed or not established.");
+        }
+        // capturar IOException (lançada pelo método)
     }
 
     //Recebe uma Message do servidor
-    public Message receive() {
-        // TODO:
+    public Message receive() throws IOException, ClassNotFoundException {
         // usar in.readObject()
         // retornar o objeto como Message
-        // capturar IOException | ClassNotFoundException
-        return null;
+        if (in != null) {
+            Object received = in.readObject();
+            if (received instanceof Message) {
+                return (Message) received;
+            }
+            throw new ClassNotFoundException("Received object is not a Message type.");
+        } else {
+            throw new IOException("Input stream is not initialized. Connection may be closed or not established.");
+        }
+        // capturar IOException | ClassNotFoundException (lançadas pelo método)
     }
 
     //Fecha a conexão e os streams.
     public void close() {
-        // TODO:
         // fechar streams e socket
         // verificar null antes de fechar
+        try {
+            if (out != null) out.close();
+        } catch (IOException ignored) {}
+        
+        try {
+            if (in != null) in.close();
+        } catch (IOException ignored) {}
+        
+        try {
+            if (socket != null && !socket.isClosed()) socket.close();
+        } catch (IOException ignored) {}
+        
+        // Limpar referências
+        out = null;
+        in = null;
+        socket = null;
     }
 
 }
-
-/*
-    classe responsável por abrir o Socket
-    ter ObjectInputStream e ObjectOutputStream
-    enviar mensagens
-    receber respostas
-*/
