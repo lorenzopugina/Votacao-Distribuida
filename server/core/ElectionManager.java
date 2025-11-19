@@ -24,7 +24,7 @@ public class ElectionManager {
         options.add("Bruna Bosco");
         options.add("Carlos Carvalho");
 
-        this.currentElection = new Election("Para quem irá seu voto?", options);
+        this.currentElection = new Election("PARA QUEM SERÁ O SEU VOTO?", options);
         System.out.println("[MANAGER] Eleição carregada: " + this.currentElection.getQuestion());
 
         // reseta os dados da lista de CPFs e votos
@@ -73,8 +73,9 @@ public class ElectionManager {
 
     public List<Integer> getResults() {
         return new ArrayList<>(this.voteCounts);
+    }    
+    
+    public List<String> getVotedCpfs() {
+        return new ArrayList<>(this.votedCpfs);
     }
 }
-
-//Manipula Election e Vote
-// carrega election, recebe voto, conta votos, etc.

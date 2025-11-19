@@ -17,17 +17,6 @@ public class CPFValidator {
                 return false;
         }
 
-        /* for (char c : cleanedCpf.toCharArray()) {
-            if (c < '0' || c > '9') 
-                return false;
-        } 
-                
-        for (int i = 0; i < tamanho; i++) {
-            char c = cleanedCpf.charAt(i);
-            if (c < '0' || c > '9')
-                return false;
-        } */ 
-
         return true;
     }
 }
