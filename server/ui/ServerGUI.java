@@ -39,7 +39,7 @@ public class ServerGUI extends JFrame {
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
 
-        // ========================= TOP PANEL =========================
+        // TOP PANEL 
         JPanel topPanel = new JPanel();
 
         newElectionButton = new JButton("Nova Eleição");
@@ -53,18 +53,18 @@ public class ServerGUI extends JFrame {
 
         add(topPanel, BorderLayout.NORTH);
 
-        // ========================= TABLE =============================
+        // TABLE
         String[] cols = {"Opção", "Votos"};
         tableModel = new DefaultTableModel(cols, 0);
         resultsTable = new JTable(tableModel);
         add(new JScrollPane(resultsTable), BorderLayout.CENTER);
 
-        // ========================= BOTÕES ============================
+        // BOTÕES
         newElectionButton.addActionListener(e -> newElection());
         startServerButton.addActionListener(e -> startServer());
         stopServerButton.addActionListener(e -> stopServer());
 
-        // ==================== AUTO-UPDATE TIMER ======================
+        // AUTO-UPDATE TIMER
         Timer timer = new Timer(true);
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override
@@ -191,14 +191,6 @@ public class ServerGUI extends JFrame {
                         results.get(i)
                 });
             }
-        });
-    }
-
-    // ===============================================================
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            ServerGUI gui = new ServerGUI();
-            gui.setVisible(true);
         });
     }
 }

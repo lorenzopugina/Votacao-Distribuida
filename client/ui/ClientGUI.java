@@ -226,12 +226,4 @@ public class ClientGUI extends JFrame {
     private void log(String txt) {
         logArea.append(txt + "\n");
     }
-
-    // ====================================================
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            ClientGUI gui = new ClientGUI();
-            gui.setVisible(true);
-        });
-    }
 }
