@@ -26,7 +26,7 @@ public class ElectionReport {
             writer.println();
             
             writer.println(election.getQuestion());
-            writer.println("Total de Votos: " + cpfs.size());
+            writer.println("Total de Votos: " + votedCpfs.size());
             writer.println();
 
             writer.println("---------- RESULTADOS ----------");

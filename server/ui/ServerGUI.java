@@ -1,20 +1,37 @@
 package server.ui;
 
-import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
+import common.model.Election;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.Map;
+import java.io.IOException;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.atomic.AtomicInteger;
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import server.core.ElectionManager;
+import server.core.ElectionReport;
+import server.net.ClientHandler;
 
 public class ServerGUI extends JFrame {
-    private JButton loadElectionButton;
+
+    private JButton newElectionButton;
     private JButton startServerButton;
     private JButton stopServerButton;
+
     private JTable resultsTable;
     private DefaultTableModel tableModel;
+
+    // Servidor 
+    private ServerSocket serverSocket;
+    private Thread serverThread;
+    private AtomicInteger clientCounter = new AtomicInteger(0);
+
+    private ElectionManager electionManager = new ElectionManager();
+
+    private static final int PORT = 5000;
 
     public ServerGUI() {
         super("Election Server");
@@ -22,90 +39,162 @@ public class ServerGUI extends JFrame {
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
 
-        // Top panel with buttons
+        // ========================= TOP PANEL =========================
         JPanel topPanel = new JPanel();
-        loadElectionButton = new JButton("Load Election");
-        startServerButton = new JButton("Start Server");
-        stopServerButton = new JButton("Stop Server");
-        stopServerButton.setEnabled(false); // Initially disabled
-        topPanel.add(loadElectionButton);
+
+        newElectionButton = new JButton("Nova Eleição");
+        startServerButton = new JButton("Iniciar Servidor");
+        stopServerButton = new JButton("Parar Servidor");
+        stopServerButton.setEnabled(false);
+
+        topPanel.add(newElectionButton);
         topPanel.add(startServerButton);
         topPanel.add(stopServerButton);
+
         add(topPanel, BorderLayout.NORTH);
 
-        // Center panel with results table
-        String[] columnNames = {"Option", "Votes"};
-        tableModel = new DefaultTableModel(columnNames, 0);
+        // ========================= TABLE =============================
+        String[] cols = {"Opção", "Votos"};
+        tableModel = new DefaultTableModel(cols, 0);
         resultsTable = new JTable(tableModel);
         add(new JScrollPane(resultsTable), BorderLayout.CENTER);
 
-        // Add button listeners
-        loadElectionButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                loadElection();
-            }
-        });
+        // ========================= BOTÕES ============================
+        newElectionButton.addActionListener(e -> newElection());
+        startServerButton.addActionListener(e -> startServer());
+        stopServerButton.addActionListener(e -> stopServer());
 
-        startServerButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                startServer();
-            }
-        });
-
-        stopServerButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                stopServer();
-            }
-        });
-
-        // Simulate real-time updates (polling example)
+        // ==================== AUTO-UPDATE TIMER ======================
         Timer timer = new Timer(true);
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
                 updateResults();
             }
-        }, 0, 2000); // Update every 2 seconds
+        }, 1000, 2000);
     }
 
-    private void loadElection() {
-        // Logic to load election (e.g., from a file or input dialog)
-        JOptionPane.showMessageDialog(this, "Election loaded successfully!");
+    private void newElection() {
+
+        JTextField questionField = new JTextField();
+        JTextField optionCountField = new JTextField();
+
+        Object[] fields = {
+                "Pergunta da eleição:", questionField,
+                "Quantidade de opções:", optionCountField
+        };
+
+        int ok = JOptionPane.showConfirmDialog(this, fields,
+                "Nova Eleição", JOptionPane.OK_CANCEL_OPTION);
+
+        if (ok != JOptionPane.OK_OPTION) return;
+
+        String question = questionField.getText().trim();
+        int optionCount;
+
+        try {
+            optionCount = Integer.parseInt(optionCountField.getText().trim());
+            if (optionCount <= 0) throw new NumberFormatException();
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this,
+                    "Número de opções inválido.", "Erro",
+                    JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        java.util.List<String> options = new java.util.ArrayList<>();
+
+        for (int i = 0; i < optionCount; i++) {
+            String opt = JOptionPane.showInputDialog(
+                    this,
+                    "Nome da opção " + (i + 1) + ":"
+            );
+            if (opt == null || opt.trim().isEmpty()) {
+                JOptionPane.showMessageDialog(this,
+                        "Opção inválida.", "Erro",
+                        JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            options.add(opt);
+        }
+
+        electionManager = new ElectionManager(); // reinicia listas
+        electionManager.loadElection(question, options);
+
+        JOptionPane.showMessageDialog(this, "Eleição criada com sucesso!");
     }
 
     private void startServer() {
-        // Logic to start the server
+        serverThread = new Thread(() -> {
+            try {
+                serverSocket = new ServerSocket(PORT);
+                System.out.println("[SERVER] Servidor iniciado na porta " + PORT);
+
+                while (!Thread.currentThread().isInterrupted()) {
+                    Socket client = serverSocket.accept();
+                    int id = clientCounter.incrementAndGet();
+                    System.out.println("[SERVER] Cliente #" + id + " conectado.");
+
+                    ClientHandler handler = new ClientHandler(client, id, electionManager);
+                    handler.start();
+                }
+            } catch (IOException e) {
+                System.out.println("[SERVER] Servidor finalizado.");
+            }
+        });
+
+        serverThread.start();
+
         startServerButton.setEnabled(false);
         stopServerButton.setEnabled(true);
-        JOptionPane.showMessageDialog(this, "Server started!");
+        JOptionPane.showMessageDialog(this, "Servidor iniciado!");
     }
 
     private void stopServer() {
-        // Logic to stop the server
+        try {
+            if (serverSocket != null)
+                serverSocket.close();
+        } catch (IOException ignored) {}
+
+        if (serverThread != null)
+            serverThread.interrupt();
+
         startServerButton.setEnabled(true);
         stopServerButton.setEnabled(false);
-        JOptionPane.showMessageDialog(this, "Server stopped!");
+
+        JOptionPane.showMessageDialog(this, "Servidor parado!");
+
+        // Gera relatório?
+        int ok = JOptionPane.showConfirmDialog(
+                this, "Deseja gerar relatório da eleição?",
+                "Relatório", JOptionPane.YES_NO_OPTION
+        );
+
+        if (ok == JOptionPane.YES_OPTION) {
+            ElectionReport.generate(electionManager, "relatorio.txt");
+        }
     }
 
     private void updateResults() {
-        // Simulate fetching results from the server
+        Election election = electionManager.getElection();
+        if (election == null) return;
+
+        List<String> options = election.getOptions();
+        List<Integer> results = electionManager.getResults();
+
         SwingUtilities.invokeLater(() -> {
-            tableModel.setRowCount(0); // Clear existing rows
-            Map<String, Integer> results = getResultsFromServer();
-            for (Map.Entry<String, Integer> entry : results.entrySet()) {
-                tableModel.addRow(new Object[]{entry.getKey(), entry.getValue()});
+            tableModel.setRowCount(0);
+
+            for (int i = 0; i < options.size(); i++) {
+                tableModel.addRow(new Object[]{
+                        options.get(i),
+                        results.get(i)
+                });
             }
         });
     }
 
-    private Map<String, Integer> getResultsFromServer() {
-        // Placeholder for server logic to fetch results
-        return Map.of("Option A", 10, "Option B", 15, "Option C", 5);
-    }
-
+    // ===============================================================
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             ServerGUI gui = new ServerGUI();
