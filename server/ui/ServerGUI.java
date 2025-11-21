@@ -24,7 +24,6 @@ public class ServerGUI extends JFrame {
     private JTable resultsTable;
     private DefaultTableModel tableModel;
 
-    // Servidor 
     private ServerSocket serverSocket;
     private Thread serverThread;
     private AtomicInteger clientCounter = new AtomicInteger(0);
@@ -39,12 +38,14 @@ public class ServerGUI extends JFrame {
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
 
-        // TOP PANEL 
+        createMenuBar();
+
+        // TOP PANEL
         JPanel topPanel = new JPanel();
 
         newElectionButton = new JButton("Nova Eleição");
-        startServerButton = new JButton("Iniciar Servidor");
-        stopServerButton = new JButton("Parar Servidor");
+        startServerButton = new JButton("Iniciar Votação");
+        stopServerButton = new JButton("Parar Votação");
         stopServerButton.setEnabled(false);
 
         topPanel.add(newElectionButton);
@@ -59,12 +60,12 @@ public class ServerGUI extends JFrame {
         resultsTable = new JTable(tableModel);
         add(new JScrollPane(resultsTable), BorderLayout.CENTER);
 
-        // BOTÕES
+        // BUTTON LISTENERS
         newElectionButton.addActionListener(e -> newElection());
         startServerButton.addActionListener(e -> startServer());
         stopServerButton.addActionListener(e -> stopServer());
 
-        // AUTO-UPDATE TIMER
+        // TIMER FOR LIVE RESULTS
         Timer timer = new Timer(true);
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override
@@ -74,8 +75,31 @@ public class ServerGUI extends JFrame {
         }, 1000, 2000);
     }
 
-    private void newElection() {
+    // MENU BAR (OPTIONS, HELP, CREDITS, EXIT)
+    private void createMenuBar() {
+        JMenuBar bar = new JMenuBar();
 
+        bar.add(Box.createHorizontalGlue());
+
+        JMenu menuSettings = new JMenu("Opções");
+
+        JMenuItem itemHelp = new JMenuItem("Ajuda");
+        itemHelp.addActionListener(e -> Help.show());
+        menuSettings.add(itemHelp);
+
+        JMenuItem itemCredits = new JMenuItem("Créditos");
+        itemCredits.addActionListener(e -> common.resources.Credits.show());
+        menuSettings.add(itemCredits);
+
+        JMenuItem itemExit = new JMenuItem("Sair do Programa");
+        itemExit.addActionListener(e -> dispose());
+        menuSettings.add(itemExit);
+
+        bar.add(menuSettings);
+        setJMenuBar(bar);
+    }
+
+    private void newElection() {
         JTextField questionField = new JTextField();
         JTextField optionCountField = new JTextField();
 
@@ -102,7 +126,7 @@ public class ServerGUI extends JFrame {
             return;
         }
 
-        java.util.List<String> options = new java.util.ArrayList<>();
+        List<String> options = new java.util.ArrayList<>();
 
         for (int i = 0; i < optionCount; i++) {
             String opt = JOptionPane.showInputDialog(
@@ -118,7 +142,7 @@ public class ServerGUI extends JFrame {
             options.add(opt);
         }
 
-        electionManager = new ElectionManager(); // reinicia listas
+        electionManager = new ElectionManager();
         electionManager.loadElection(question, options);
 
         JOptionPane.showMessageDialog(this, "Eleição criada com sucesso!");
@@ -147,6 +171,7 @@ public class ServerGUI extends JFrame {
 
         startServerButton.setEnabled(false);
         stopServerButton.setEnabled(true);
+
         JOptionPane.showMessageDialog(this, "Servidor iniciado!");
     }
 
@@ -164,7 +189,6 @@ public class ServerGUI extends JFrame {
 
         JOptionPane.showMessageDialog(this, "Servidor parado!");
 
-        // Gera relatório?
         int ok = JOptionPane.showConfirmDialog(
                 this, "Deseja gerar relatório da eleição?",
                 "Relatório", JOptionPane.YES_NO_OPTION
@@ -184,7 +208,6 @@ public class ServerGUI extends JFrame {
 
         SwingUtilities.invokeLater(() -> {
             tableModel.setRowCount(0);
-
             for (int i = 0; i < options.size(); i++) {
                 tableModel.addRow(new Object[]{
                         options.get(i),

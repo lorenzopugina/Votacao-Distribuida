@@ -1,0 +1,15 @@
+==================== Ajuda ao Cliente ==================== 
+
+1. Para começar a votar, clique em "Começar Votação".
+2. Escolha uma das opção da eleição.
+3. No campo inferior, digite seu CPF e clique em votar.
+
+Não se esqueça que é apenas 1 voto por CPF!
+
+Você pode sair da votação quando quiser
+clicando em "Sair da votação"
+
+
+Para fechar o programa, vá no menu "opções" 
+e clique em "sair do programa"
+======================================================

@@ -18,7 +18,7 @@ public class ElectionReport {
 
         try (PrintWriter writer = new PrintWriter(new FileWriter(filename))) {
             writer.println("========================================");
-            writer.println("          RELATÓRIO DA ELEIÇÃO          ");
+            writer.println("          RELATORIO DA ELEICAO          ");
             writer.println("========================================");
 
             String dateHour = LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss"));
@@ -33,7 +33,7 @@ public class ElectionReport {
 
             List<String> options = election.getOptions();
             for (int i = 0; i < options.size(); i++) {
-                writer.printf("Opção %d: %s - Votos: %d%n", i, options.get(i), results.get(i));
+                writer.printf("OpCAo %d: %s - Votos: %d%n", i, options.get(i), results.get(i));
             }
 
             writer.println();
@@ -43,7 +43,7 @@ public class ElectionReport {
             }
 
             writer.println("========================================");
-            System.out.println("[REPORT] Relatório salvo com sucesso!");
+            System.out.println("[REPORT] Relatorio salvo com sucesso!");
         
         } catch (IOException e) {
             System.err.println("[REPORT] Erro ao salvar: " + e.getMessage());

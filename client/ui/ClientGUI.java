@@ -5,16 +5,13 @@ import common.model.Election;
 import common.model.Message;
 import common.model.Vote;
 import common.net.NetCommand;
-import server.core.CPFValidator; 
-
-import javax.swing.*;
 import java.awt.*;
 import java.util.List;
+import javax.swing.*;
+import server.core.CPFValidator;
 
 public class ClientGUI extends JFrame {
 
-    private JTextField serverField;
-    private JTextField portField;
     private JButton connectButton;
     private JButton disconnectButton;
 
@@ -30,46 +27,44 @@ public class ClientGUI extends JFrame {
     private ClientConnection connection;
     private Election currentElection;
 
+    private JPanel centerPanel;
+
+    // Fixed configuration
+    private static final String SERVER_HOST = "localhost";
+    private static final int SERVER_PORT = 5000;
+
     public ClientGUI() {
-        super("Cliente de Votação");
-        setSize(600, 500);
+        super("Voting Client");
+        setSize(650, 500);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
 
-        // PAINEL SUPERIOR (conexão)
-        JPanel topPanel = new JPanel(new GridLayout(2, 3));
+        createMenuBar();
 
-        serverField = new JTextField("localhost");
-        portField = new JTextField("5000");
+        // TOP PANEL (Connection buttons) 
+        JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 
-        connectButton = new JButton("Conectar");
-        disconnectButton = new JButton("Desconectar");
+        connectButton = new JButton("Começar votação");
+        disconnectButton = new JButton("Sair da votação");
         disconnectButton.setEnabled(false);
 
-        topPanel.add(new JLabel("Servidor:"));
-        topPanel.add(new JLabel("Porta:"));
-        topPanel.add(new JLabel(""));
-
-        topPanel.add(serverField);
-        topPanel.add(portField);
         topPanel.add(connectButton);
+        topPanel.add(disconnectButton);
 
         add(topPanel, BorderLayout.NORTH);
 
-        // PAINEL CENTRAL (eleição)
-        JPanel centerPanel = new JPanel();
+        // CENTER PANEL (Election data)
+        centerPanel = new JPanel();
         centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.Y_AXIS));
 
-        questionLabel = new JLabel("Nenhuma eleição carregada.");
+        questionLabel = new JLabel("Conecte-se para votar.", SwingConstants.CENTER);
         questionLabel.setFont(new Font("Arial", Font.BOLD, 16));
         questionLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
         centerPanel.add(questionLabel);
-
-        optionGroup = new ButtonGroup();
-
         add(centerPanel, BorderLayout.CENTER);
 
-        // PAINEL DE VOTO
+        // BOTTOM PANEL (Vote submission)
         JPanel votePanel = new JPanel();
 
         cpfField = new JTextField(12);
@@ -82,7 +77,7 @@ public class ClientGUI extends JFrame {
 
         add(votePanel, BorderLayout.SOUTH);
 
-        // LOG
+        // LOG PANEL
         logArea = new JTextArea();
         logArea.setEditable(false);
         add(new JScrollPane(logArea), BorderLayout.EAST);
@@ -93,28 +88,54 @@ public class ClientGUI extends JFrame {
         voteButton.addActionListener(e -> sendVote());
     }
 
-    // CONECTAR AO SERVIDOR
+    // MENU BAR
+    private void createMenuBar() {
+        
+        JMenuBar bar = new JMenuBar();
+
+        bar.add(Box.createHorizontalGlue());
+
+        // SETTINGS MENU
+        JMenu menuSettings = new JMenu("Opções");
+
+        // Help
+        JMenuItem itemHelp = new JMenuItem("Ajuda");
+        itemHelp.addActionListener(e -> client.ui.Help.show());
+        menuSettings.add(itemHelp);
+
+        // Credits
+        JMenuItem itemCredits = new JMenuItem("Créditos");
+        itemCredits.addActionListener(e -> common.resources.Credits.show());
+        menuSettings.add(itemCredits);
+
+        // Exit
+        JMenuItem itemExit = new JMenuItem("Sair do Programa");
+        itemExit.addActionListener(e -> dispose());
+        menuSettings.add(itemExit);
+
+        bar.add(menuSettings);
+        setJMenuBar(bar);
+    }
+
+    // CONNECT TO SERVER
     private void connectToServer() {
         try {
-            String host = serverField.getText().trim();
-            int port = Integer.parseInt(portField.getText().trim());
-
-            connection = new ClientConnection(host, port);
+            connection = new ClientConnection(SERVER_HOST, SERVER_PORT);
             connection.connect();
 
             connectButton.setEnabled(false);
             disconnectButton.setEnabled(true);
 
-            log("Conectado ao servidor.");
+            log("Conectado ao servidor");
 
             requestElection();
 
         } catch (Exception e) {
-            log("Erro ao conectar: " + e.getMessage());
+            log("Falha na conexão: " + e.getMessage());
         }
     }
 
-    // PEDIR ELEIÇÃO
+    // REQUEST ELECTION
     private void requestElection() {
         try {
             Message req = new Message(NetCommand.REQUEST_ELECTION, null, true, "");
@@ -125,27 +146,23 @@ public class ClientGUI extends JFrame {
             if (resp.getCommand() == NetCommand.SEND_ELECTION) {
                 currentElection = (Election) resp.getPayload();
                 loadElectionOnScreen(currentElection);
-                log("Eleição recebida.");
+                log("Eleição recebida com sucesso");
             } else {
-                log("Servidor retornou comando inesperado.");
+                log("Comando inesperado");
             }
 
         } catch (Exception e) {
-            log("Erro ao solicitar eleição: " + e.getMessage());
+            log("Erro ao receber votação: " + e.getMessage());
         }
     }
 
-    // MOSTRAR ELEIÇÃO NA TELA
+    // LOAD ELECTION ON SCREEN
     private void loadElectionOnScreen(Election election) {
 
+        centerPanel.removeAll();
+
         questionLabel.setText(election.getQuestion());
-
-        // Remove radio buttons antigos
-        Container center = getContentPane().getComponent(1);
-        JPanel panel = (JPanel) center;
-        panel.removeAll();
-
-        panel.add(questionLabel);
+        centerPanel.add(questionLabel);
 
         optionGroup = new ButtonGroup();
         List<String> options = election.getOptions();
@@ -154,27 +171,25 @@ public class ClientGUI extends JFrame {
         for (int i = 0; i < options.size(); i++) {
             optionButtons[i] = new JRadioButton(options.get(i));
             optionGroup.add(optionButtons[i]);
-            panel.add(optionButtons[i]);
+            centerPanel.add(optionButtons[i]);
         }
 
         voteButton.setEnabled(true);
 
-        revalidate();
-        repaint();
+        centerPanel.revalidate();
+        centerPanel.repaint();
     }
 
-    // ENVIAR VOTO
+    // SEND VOTE
     private void sendVote() {
         try {
             String cpf = cpfField.getText().trim();
 
-            // valida CPF localmente
             if (!CPFValidator.validate(cpf)) {
-                JOptionPane.showMessageDialog(this, "CPF inválido!", "Erro", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, "CPF Inválido ou ja votou!", "Erro", JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
-            // pega opção selecionada
             int selectedIndex = -1;
             for (int i = 0; i < optionButtons.length; i++) {
                 if (optionButtons[i].isSelected()) {
@@ -184,26 +199,26 @@ public class ClientGUI extends JFrame {
             }
 
             if (selectedIndex == -1) {
-                JOptionPane.showMessageDialog(this, "Selecione uma opção!", "Erro", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Escolha uma opção!", "Erro", JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
             Vote vote = new Vote(cpf, selectedIndex);
-
             Message req = new Message(NetCommand.SEND_VOTE, vote, true, "");
+
             connection.send(req);
 
             Message resp = connection.receive();
 
             JOptionPane.showMessageDialog(this, resp.getMessage());
-            log("Voto enviado, resposta: " + resp.getMessage());
+            log("Voto enviado: " + resp.getMessage());
 
         } catch (Exception e) {
             log("Erro ao votar: " + e.getMessage());
         }
     }
 
-    // DESCONECTAR
+    // DISCONNECT
     private void disconnect() {
         try {
             if (connection != null) {
@@ -215,14 +230,13 @@ public class ClientGUI extends JFrame {
             connectButton.setEnabled(true);
             disconnectButton.setEnabled(false);
 
-            log("Desconectado.");
+            log("Disconectado.");
 
         } catch (Exception e) {
-            log("Erro ao desconectar: " + e.getMessage());
+            log("Erro ao disconectar: " + e.getMessage());
         }
     }
 
-    // LOG
     private void log(String txt) {
         logArea.append(txt + "\n");
     }

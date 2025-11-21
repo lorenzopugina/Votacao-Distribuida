@@ -19,7 +19,6 @@ public class NetProtocol {
         }
     }
 
-    // recebe mensagem (bloqueante)
     public static Message receive(ObjectInputStream in) {
         try {
             Object obj = in.readObject();
@@ -28,7 +27,7 @@ public class NetProtocol {
                 return msg;
             }
 
-            return new Message(NetCommand.ERROR, null, false, "Invalid object type received");
+            return new Message(NetCommand.ERROR, null, false, "Tipo de objeto inválido recebido");
 
         } catch (EOFException e) {
             System.out.println("[NET] Conexão finalizada pelo remoto.");

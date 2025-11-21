@@ -1,0 +1,18 @@
+===================== Ajuda ao Servidor =====================
+
+1. Para iniciar uma eleição clique em "Nova eleição".
+2. Digite a pergunta da eleição e quantidade de opções de voto.
+3. Digite separadamente cada opção da eleição.
+
+4. Com a eleição criada, clique em "iniciar votação"
+
+Os votos aparecem em tempo real e você poder finalizar a 
+eleição quando preferir clicando em "Parar votação".
+
+Após a finalização da eleição, você poder gerar um relatório 
+com os dados da votação.
+
+
+Para fechar o programa, vá no menu "opções" 
+e clique em "sair do programa"
+=========================================================

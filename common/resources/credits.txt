@@ -1,0 +1,22 @@
+===================== Créditos =====================
+
+Esse projeto é um trabalho da disciplina:
+SI400A - Programação Orientada a Objetos II
+
+Orientada pelo Prof. Dr. André Franceschi de Angelis
+---------------------------------------------------
+Elaborado por: 
+
+GRUPO 07
+
+Adriano Baumgarte Bassani Filho      --     288824
+Ana Vitória Cardoso Queiroz      ---------     172706
+Bianca Yukari Oshiro      -------------------     232179
+João Vitor Da Fraga Anacleto      --------     269175
+Lorenzo De Oliveira Pugina      ----------     234073
+Maria Clara Souza Muharem      ---------     266864
+
+
+FT - Faculdade de Tecnologia da UNICAMP
+---      Limeira-SP, 2025      ---
+==================================================

@@ -2,13 +2,9 @@ package server.net;
 
 import common.model.*;
 import common.net.NetCommand;
-import server.core.ElectionManager;
-
 import java.io.*;
 import java.net.Socket;
-
-//Thread que atende individualmente cada cliente.
-//Usa Message (comando + dados) e interage com o ElectionManager.
+import server.core.ElectionManager;
  
 public class ClientHandler extends Thread {
 
@@ -32,7 +28,6 @@ public class ClientHandler extends Thread {
             boolean running = true;
 
             while (running) {
-                // Aguarda mensagem do cliente
                 Object received = in.readObject();
 
                 if (received instanceof Message msg) {
@@ -40,34 +35,30 @@ public class ClientHandler extends Thread {
 
                     switch (msg.getCommand()) {
                         case REQUEST_ELECTION -> {
-                            // Cliente pediu os dados da eleição
                             Election election = electionManager.getElection();
-                            Message response = new Message(NetCommand.SEND_ELECTION, election, true, "Election sent");
+                            Message response = new Message(NetCommand.SEND_ELECTION, election, true, "Eleição enviada");
                             out.writeObject(response);
                             out.flush();
                         }
 
                         case SEND_VOTE -> {
-                            // Cliente enviou o voto
                             Vote vote = (Vote) msg.getPayload();
                             boolean success = electionManager.receiveVote(vote);
                             Message response = new Message(NetCommand.SEND_VOTE, null, success,
-                                    success ? "Vote registered!" : "Invalid or duplicate vote!");
+                                    success ? "Voto registrado!" : "voto inválido ou duplicado!");
                             out.writeObject(response);
                             out.flush();
                         }
 
                         case DISCONNECT -> {
-                            // Cliente pediu para disconectar do servidor
                             running = false;
-                            Message response = new Message(NetCommand.DISCONNECT, null, true, "Disconnected");
+                            Message response = new Message(NetCommand.DISCONNECT, null, true, "DIsconectado");
                             out.writeObject(response);
                             out.flush();
                         }
 
                         default -> {
-                            // Comando desconhecido
-                            Message response = new Message(NetCommand.ERROR, null, false, "Unknown command");
+                            Message response = new Message(NetCommand.ERROR, null, false, "Comando disconhecido");
                             out.writeObject(response);
                             out.flush();
                         }
