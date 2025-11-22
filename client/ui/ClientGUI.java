@@ -5,6 +5,8 @@ import common.model.Election;
 import common.model.Message;
 import common.model.Vote;
 import common.net.NetCommand;
+import common.ui.Credits;
+import common.ui.Help;
 import java.awt.*;
 import java.util.List;
 import javax.swing.*;
@@ -112,11 +114,13 @@ public class ClientGUI extends JFrame {
         JMenu menuSettings = new JMenu("Opções");
 
         JMenuItem itemHelp = new JMenuItem("Ajuda");
-        itemHelp.addActionListener(e -> client.ui.Help.show());
+        itemHelp.addActionListener(e ->
+            Help.show("common/resources/clientHelp.txt")
+        );
         menuSettings.add(itemHelp);
 
         JMenuItem itemCredits = new JMenuItem("Créditos");
-        itemCredits.addActionListener(e -> common.resources.Credits.show());
+        itemCredits.addActionListener(e -> Credits.show());
         menuSettings.add(itemCredits);
 
         JMenuItem itemExit = new JMenuItem("Sair do Programa");

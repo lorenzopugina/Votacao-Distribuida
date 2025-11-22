@@ -1,8 +1,9 @@
 ==================== Ajuda ao Cliente ==================== 
 
-Se estiver em apenas um computador, não altere os campos IP e porta
-Se o servidor for um computador diferente, basta colocar o IP do
-servidor e a porta definida por ele (por padrão 5000)
+Se servidor e cliente forem o mesmo computador, não altere os campos IP e porta
+
+Do contrário, basta colocar o IP do servidor (indicado na janela do servidor) 
+e a porta definida por ele (por padrão 5000)
 
 1. Para começar a votar, clique em "Começar Votação".
 2. Escolha uma das opção da eleição.

@@ -1,4 +1,7 @@
 ===================== Ajuda ao Servidor =====================
+O IP exibido ajudará o cliente a se conectar se estiver em
+computadores diferentes (é necessário estarem na mesma rede)
+Também é possível alterar a porta de rede.
 
 1. Para iniciar uma eleição clique em "Nova eleição".
 2. Digite a pergunta da eleição e quantidade de opções de voto.

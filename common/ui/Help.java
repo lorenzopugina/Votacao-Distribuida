@@ -1,4 +1,4 @@
-package server.ui;
+package common.ui;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -7,12 +7,15 @@ import javax.swing.*;
 
 public class Help {
 
-    private static final String FILE_PATH = "common/resources/serverHelp.txt";
-
-    public static void show() {
+    public static void show(String filePath) {
         try {
-            String content = Files.readString(Path.of(FILE_PATH));
-            JOptionPane.showMessageDialog(null, content, "Ajuda", JOptionPane.INFORMATION_MESSAGE);
+            String content = Files.readString(Path.of(filePath));
+            JOptionPane.showMessageDialog(
+                null,
+                content,
+                "Ajuda",
+                JOptionPane.INFORMATION_MESSAGE
+            );
         } catch (IOException e) {
             JOptionPane.showMessageDialog(
                 null,

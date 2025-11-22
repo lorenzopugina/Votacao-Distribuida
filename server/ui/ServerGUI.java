@@ -1,12 +1,14 @@
 package server.ui;
 
 import common.model.Election;
+import common.ui.Credits;
+import common.ui.Help;
 import java.awt.*;
 import java.io.IOException;
-import java.net.ServerSocket;
-import java.net.Socket;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.net.SocketException;
 import java.util.Enumeration;
 import java.util.List;
@@ -109,11 +111,13 @@ public class ServerGUI extends JFrame {
         JMenu menuSettings = new JMenu("Opções");
 
         JMenuItem itemHelp = new JMenuItem("Ajuda");
-        itemHelp.addActionListener(e -> Help.show());
+        itemHelp.addActionListener(e ->
+            Help.show("common/resources/serverHelp.txt")
+        );
         menuSettings.add(itemHelp);
 
         JMenuItem itemCredits = new JMenuItem("Créditos");
-        itemCredits.addActionListener(e -> common.resources.Credits.show());
+        itemCredits.addActionListener(e -> Credits.show());
         menuSettings.add(itemCredits);
 
         JMenuItem itemExit = new JMenuItem("Sair do Programa");
