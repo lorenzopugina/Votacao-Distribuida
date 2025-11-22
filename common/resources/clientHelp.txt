@@ -1,5 +1,9 @@
 ==================== Ajuda ao Cliente ==================== 
 
+Se estiver em apenas um computador, não altere os campos IP e porta
+Se o servidor for um computador diferente, basta colocar o IP do
+servidor e a porta definida por ele (por padrão 5000)
+
 1. Para começar a votar, clique em "Começar Votação".
 2. Escolha uma das opção da eleição.
 3. No campo inferior, digite seu CPF e clique em votar.

@@ -12,6 +12,9 @@ import server.core.CPFValidator;
 
 public class ClientGUI extends JFrame {
 
+    private JTextField serverField;
+    private JTextField portField;
+
     private JButton connectButton;
     private JButton disconnectButton;
 
@@ -29,10 +32,6 @@ public class ClientGUI extends JFrame {
 
     private JPanel centerPanel;
 
-    // Fixed configuration
-    private static final String SERVER_HOST = "localhost";
-    private static final int SERVER_PORT = 5000;
-
     public ClientGUI() {
         super("Voting Client");
         setSize(650, 500);
@@ -41,19 +40,34 @@ public class ClientGUI extends JFrame {
 
         createMenuBar();
 
-        // TOP PANEL (Connection buttons) 
-        JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        // TOP PANEL (Connection)
+        JPanel topPanel = new JPanel();
+        topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.Y_AXIS));
 
+        JPanel connectionRow1 = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        serverField = new JTextField("localhost", 12);
+        portField = new JTextField("5000", 5);
+
+        connectionRow1.add(new JLabel("IP:"));
+        connectionRow1.add(serverField);
+        connectionRow1.add(new JLabel("Porta:"));
+        connectionRow1.add(portField);
+
+        JPanel connectionRow2 = new JPanel(new FlowLayout(FlowLayout.LEFT));
         connectButton = new JButton("Começar votação");
         disconnectButton = new JButton("Sair da votação");
         disconnectButton.setEnabled(false);
 
-        topPanel.add(connectButton);
-        topPanel.add(disconnectButton);
+        connectionRow2.add(connectButton);
+        connectionRow2.add(disconnectButton);
+
+        topPanel.add(connectionRow1);
+        topPanel.add(connectionRow2);
 
         add(topPanel, BorderLayout.NORTH);
 
-        // CENTER PANEL (Election data)
+
+        // CENTER PANEL (Election)
         centerPanel = new JPanel();
         centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.Y_AXIS));
 
@@ -64,7 +78,7 @@ public class ClientGUI extends JFrame {
         centerPanel.add(questionLabel);
         add(centerPanel, BorderLayout.CENTER);
 
-        // BOTTOM PANEL (Vote submission)
+        // BOTTOM PANEL (Vote)
         JPanel votePanel = new JPanel();
 
         cpfField = new JTextField(12);
@@ -90,25 +104,21 @@ public class ClientGUI extends JFrame {
 
     // MENU BAR
     private void createMenuBar() {
-        
+
         JMenuBar bar = new JMenuBar();
 
         bar.add(Box.createHorizontalGlue());
 
-        // SETTINGS MENU
         JMenu menuSettings = new JMenu("Opções");
 
-        // Help
         JMenuItem itemHelp = new JMenuItem("Ajuda");
         itemHelp.addActionListener(e -> client.ui.Help.show());
         menuSettings.add(itemHelp);
 
-        // Credits
         JMenuItem itemCredits = new JMenuItem("Créditos");
         itemCredits.addActionListener(e -> common.resources.Credits.show());
         menuSettings.add(itemCredits);
 
-        // Exit
         JMenuItem itemExit = new JMenuItem("Sair do Programa");
         itemExit.addActionListener(e -> dispose());
         menuSettings.add(itemExit);
@@ -120,7 +130,10 @@ public class ClientGUI extends JFrame {
     // CONNECT TO SERVER
     private void connectToServer() {
         try {
-            connection = new ClientConnection(SERVER_HOST, SERVER_PORT);
+            String host = serverField.getText().trim();
+            int port = Integer.parseInt(portField.getText().trim());
+
+            connection = new ClientConnection(host, port);
             connection.connect();
 
             connectButton.setEnabled(false);

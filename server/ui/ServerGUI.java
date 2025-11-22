@@ -30,7 +30,7 @@ public class ServerGUI extends JFrame {
 
     private ElectionManager electionManager = new ElectionManager();
 
-    private static final int PORT = 5000;
+    private JTextField portField;
 
     public ServerGUI() {
         super("Election Server");
@@ -42,17 +42,28 @@ public class ServerGUI extends JFrame {
 
         // TOP PANEL
         JPanel topPanel = new JPanel();
+        topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.Y_AXIS));
 
+        JPanel portPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        portField = new JTextField("5000", 5);
+        portPanel.add(new JLabel("Porta:"));
+        portPanel.add(portField);
+
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         newElectionButton = new JButton("Nova Eleição");
         startServerButton = new JButton("Iniciar Votação");
         stopServerButton = new JButton("Parar Votação");
         stopServerButton.setEnabled(false);
 
-        topPanel.add(newElectionButton);
-        topPanel.add(startServerButton);
-        topPanel.add(stopServerButton);
+        buttonPanel.add(newElectionButton);
+        buttonPanel.add(startServerButton);
+        buttonPanel.add(stopServerButton);
+
+        topPanel.add(portPanel);
+        topPanel.add(buttonPanel);
 
         add(topPanel, BorderLayout.NORTH);
+
 
         // TABLE
         String[] cols = {"Opção", "Votos"};
@@ -60,7 +71,7 @@ public class ServerGUI extends JFrame {
         resultsTable = new JTable(tableModel);
         add(new JScrollPane(resultsTable), BorderLayout.CENTER);
 
-        // BUTTON LISTENERS
+        // LISTENERS
         newElectionButton.addActionListener(e -> newElection());
         startServerButton.addActionListener(e -> startServer());
         stopServerButton.addActionListener(e -> stopServer());
@@ -151,8 +162,11 @@ public class ServerGUI extends JFrame {
     private void startServer() {
         serverThread = new Thread(() -> {
             try {
-                serverSocket = new ServerSocket(PORT);
-                System.out.println("[SERVER] Servidor iniciado na porta " + PORT);
+
+                int port = Integer.parseInt(portField.getText().trim());
+
+                serverSocket = new ServerSocket(port);
+                System.out.println("[SERVER] Servidor iniciado na porta " + port);
 
                 while (!Thread.currentThread().isInterrupted()) {
                     Socket client = serverSocket.accept();
