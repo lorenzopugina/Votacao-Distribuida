@@ -2,10 +2,11 @@ package server.net;
 
 import common.model.*;
 import common.net.NetCommand;
+import common.net.NetProtocol;
 import java.io.*;
 import java.net.Socket;
 import server.core.ElectionManager;
- 
+
 public class ClientHandler extends Thread {
 
     private final Socket clientSocket;
@@ -22,58 +23,80 @@ public class ClientHandler extends Thread {
     public void run() {
         System.out.println("[SERVER] Cliente " + clientId + " sendo atendido...");
 
-        try (ObjectOutputStream out = new ObjectOutputStream(clientSocket.getOutputStream());
-             ObjectInputStream in = new ObjectInputStream(clientSocket.getInputStream())) {
+        try (
+            ObjectOutputStream out = new ObjectOutputStream(clientSocket.getOutputStream());
+            ObjectInputStream in = new ObjectInputStream(clientSocket.getInputStream())
+        ) {
 
             boolean running = true;
 
             while (running) {
-                Object received = in.readObject();
+                
+                Message msg = NetProtocol.receive(in);
 
-                if (received instanceof Message msg) {
-                    System.out.println("[SERVER] Mensagem recebida de cliente #" + clientId + ": " + msg.getCommand());
+                if (msg == null) {
+                    System.out.println("[SERVER] Cliente #" + clientId + " desconectou.");
+                    break;
+                }
 
-                    switch (msg.getCommand()) {
-                        case REQUEST_ELECTION -> {
-                            Election election = electionManager.getElection();
-                            Message response = new Message(NetCommand.SEND_ELECTION, election, true, "Eleição enviada");
-                            out.writeObject(response);
-                            out.flush();
-                        }
+                System.out.println("[SERVER] Mensagem recebida de cliente #" + clientId + ": " + msg.getCommand());
 
-                        case SEND_VOTE -> {
-                            Vote vote = (Vote) msg.getPayload();
-                            boolean success = electionManager.receiveVote(vote);
-                            Message response = new Message(NetCommand.SEND_VOTE, null, success,
-                                    success ? "Voto registrado!" : "voto inválido ou duplicado!");
-                            out.writeObject(response);
-                            out.flush();
-                        }
+                switch (msg.getCommand()) {
 
-                        case DISCONNECT -> {
-                            running = false;
-                            Message response = new Message(NetCommand.DISCONNECT, null, true, "DIsconectado");
-                            out.writeObject(response);
-                            out.flush();
-                        }
+                    case REQUEST_ELECTION -> {
+                        Election election = electionManager.getElection();
+                        Message response = new Message(
+                                NetCommand.SEND_ELECTION,
+                                election,
+                                true,
+                                "Eleição enviada"
+                        );
+                        NetProtocol.send(out, response);
+                    }
+                    case SEND_VOTE -> {
+                        Vote vote = (Vote) msg.getPayload();
+                        boolean success = electionManager.receiveVote(vote);
 
-                        default -> {
-                            Message response = new Message(NetCommand.ERROR, null, false, "Comando disconhecido");
-                            out.writeObject(response);
-                            out.flush();
-                        }
+                        Message response = new Message(
+                                NetCommand.SEND_VOTE,
+                                null,
+                                success,
+                                success ? "Voto registrado!" : "voto inválido ou duplicado!"
+                        );
+                        NetProtocol.send(out, response);
+                    }
+                    case DISCONNECT -> {
+                        running = false;
+                        Message response = new Message(
+                                NetCommand.DISCONNECT,
+                                null,
+                                true,
+                                "Desconectado"
+                        );
+                        NetProtocol.send(out, response);
+                    }
+
+                    // UNKNOWN COMMAND
+                    default -> {
+                        Message response = new Message(
+                                NetCommand.ERROR,
+                                null,
+                                false,
+                                "Comando desconhecido"
+                        );
+                        NetProtocol.send(out, response);
                     }
                 }
             }
 
-        } catch (EOFException e) {
-            System.out.println("[SERVER] Cliente #" + clientId + " desconectou.");
-        } catch (IOException | ClassNotFoundException e) {
+        } catch (IOException e) {
             System.err.println("[SERVER] Erro no cliente #" + clientId + ": " + e.getMessage());
+
         } finally {
             try {
                 clientSocket.close();
             } catch (IOException ignored) {}
+
             System.out.println("[SERVER] Conexão encerrada com cliente #" + clientId);
         }
     }

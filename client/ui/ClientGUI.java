@@ -1,10 +1,10 @@
 package client.ui;
 
-import client.net.ClientConnection;
 import common.model.Election;
 import common.model.Message;
 import common.model.Vote;
 import common.net.NetCommand;
+import common.net.NetControl;
 import common.ui.Credits;
 import common.ui.Help;
 import java.awt.*;
@@ -29,7 +29,8 @@ public class ClientGUI extends JFrame {
 
     private JTextArea logArea;
 
-    private ClientConnection connection;
+    private NetControl connection;
+
     private Election currentElection;
 
     private JPanel centerPanel;
@@ -67,7 +68,6 @@ public class ClientGUI extends JFrame {
         topPanel.add(connectionRow2);
 
         add(topPanel, BorderLayout.NORTH);
-
 
         // CENTER PANEL (Election)
         centerPanel = new JPanel();
@@ -137,8 +137,14 @@ public class ClientGUI extends JFrame {
             String host = serverField.getText().trim();
             int port = Integer.parseInt(portField.getText().trim());
 
-            connection = new ClientConnection(host, port);
-            connection.connect();
+            connection = new NetControl();
+
+            boolean ok = connection.connect(host, port);
+
+            if (!ok) {
+                log("Falha ao conectar ao servidor.");
+                return;
+            }
 
             connectButton.setEnabled(false);
             disconnectButton.setEnabled(true);
@@ -160,7 +166,7 @@ public class ClientGUI extends JFrame {
 
             Message resp = connection.receive();
 
-            if (resp.getCommand() == NetCommand.SEND_ELECTION) {
+            if (resp != null && resp.getCommand() == NetCommand.SEND_ELECTION) {
                 currentElection = (Election) resp.getPayload();
                 loadElectionOnScreen(currentElection);
                 log("Eleição recebida com sucesso");

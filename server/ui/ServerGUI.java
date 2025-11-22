@@ -52,6 +52,7 @@ public class ServerGUI extends JFrame {
         JPanel topPanel = new JPanel();
         topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.Y_AXIS));
 
+        // PORT + IP PANEL
         JPanel portPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         portField = new JTextField("5000", 5);
         portPanel.add(new JLabel("Porta:"));
@@ -65,6 +66,7 @@ public class ServerGUI extends JFrame {
         refreshIpButton.addActionListener(ev -> ipLabel.setText("IP: " + getLocalIpAddress()));
         portPanel.add(refreshIpButton);
 
+        // BUTTON PANEL
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         newElectionButton = new JButton("Nova Eleição");
         startServerButton = new JButton("Iniciar Votação");
@@ -79,7 +81,6 @@ public class ServerGUI extends JFrame {
         topPanel.add(buttonPanel);
 
         add(topPanel, BorderLayout.NORTH);
-
 
         // TABLE
         String[] cols = {"Opção", "Votos"};
@@ -102,7 +103,7 @@ public class ServerGUI extends JFrame {
         }, 1000, 2000);
     }
 
-    // MENU BAR (OPTIONS, HELP, CREDITS, EXIT)
+    // MENU BAR
     private void createMenuBar() {
         JMenuBar bar = new JMenuBar();
 
@@ -112,7 +113,7 @@ public class ServerGUI extends JFrame {
 
         JMenuItem itemHelp = new JMenuItem("Ajuda");
         itemHelp.addActionListener(e ->
-            Help.show("common/resources/serverHelp.txt")
+                Help.show("common/resources/serverHelp.txt")
         );
         menuSettings.add(itemHelp);
 
@@ -128,6 +129,7 @@ public class ServerGUI extends JFrame {
         setJMenuBar(bar);
     }
 
+    // CREATE NEW ELECTION
     private void newElection() {
         JTextField questionField = new JTextField();
         JTextField optionCountField = new JTextField();
@@ -177,10 +179,10 @@ public class ServerGUI extends JFrame {
         JOptionPane.showMessageDialog(this, "Eleição criada com sucesso!");
     }
 
+    // START SERVER
     private void startServer() {
         serverThread = new Thread(() -> {
             try {
-
                 int port = Integer.parseInt(portField.getText().trim());
 
                 serverSocket = new ServerSocket(port);
@@ -194,6 +196,7 @@ public class ServerGUI extends JFrame {
                     ClientHandler handler = new ClientHandler(client, id, electionManager);
                     handler.start();
                 }
+
             } catch (IOException e) {
                 System.out.println("[SERVER] Servidor finalizado.");
             }
@@ -207,6 +210,7 @@ public class ServerGUI extends JFrame {
         JOptionPane.showMessageDialog(this, "Servidor iniciado!");
     }
 
+    // STOP SERVER
     private void stopServer() {
         try {
             if (serverSocket != null)
@@ -231,6 +235,7 @@ public class ServerGUI extends JFrame {
         }
     }
 
+    // UPDATE RESULTS LIVE
     private void updateResults() {
         Election election = electionManager.getElection();
         if (election == null) return;
@@ -249,6 +254,7 @@ public class ServerGUI extends JFrame {
         });
     }
 
+    // GET LOCAL IP
     private String getLocalIpAddress() {
         try {
             Enumeration<NetworkInterface> nets = NetworkInterface.getNetworkInterfaces();
@@ -265,6 +271,7 @@ public class ServerGUI extends JFrame {
                 }
             }
         } catch (SocketException ignored) {}
+
         try {
             return InetAddress.getLocalHost().getHostAddress();
         } catch (Exception e) {
