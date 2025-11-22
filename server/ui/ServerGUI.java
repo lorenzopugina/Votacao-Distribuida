@@ -54,11 +54,11 @@ public class ServerGUI extends JFrame {
         portField = new JTextField("5000", 5);
         portPanel.add(new JLabel("Porta:"));
         portPanel.add(portField);
-        // label para exibir o IP local
+
         ipLabel = new JLabel("IP: " + getLocalIpAddress());
         portPanel.add(Box.createHorizontalStrut(12));
         portPanel.add(ipLabel);
-        // botão para atualizar o IP à mão
+
         refreshIpButton = new JButton("Atualizar IP");
         refreshIpButton.addActionListener(ev -> ipLabel.setText("IP: " + getLocalIpAddress()));
         portPanel.add(refreshIpButton);
@@ -245,7 +245,6 @@ public class ServerGUI extends JFrame {
         });
     }
 
-    // procura um endereço IPv4 não-loopback nas interfaces ativas
     private String getLocalIpAddress() {
         try {
             Enumeration<NetworkInterface> nets = NetworkInterface.getNetworkInterfaces();
