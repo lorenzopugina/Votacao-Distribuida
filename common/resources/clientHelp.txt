@@ -1,8 +1,8 @@
-==================== Ajuda ao Cliente ==================== 
+====================== Ajuda ao Cliente ======================
 
-Se servidor e cliente forem o mesmo computador, não altere os campos IP e porta
+Se servidor e cliente forem o mesmo computador, não altere IP e porta
 
-Do contrário, basta colocar o IP do servidor (indicado na janela do servidor) 
+Do contrário, digite o IP do servidor (indicado na janela do server) 
 e a porta definida por ele (por padrão 5000)
 
 1. Para começar a votar, clique em "Começar Votação".
@@ -17,4 +17,4 @@ clicando em "Sair da votação"
 
 Para fechar o programa, vá no menu "opções" 
 e clique em "sair do programa"
-======================================================
+==========================================================
