@@ -5,6 +5,10 @@ import java.awt.*;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -31,6 +35,8 @@ public class ServerGUI extends JFrame {
     private ElectionManager electionManager = new ElectionManager();
 
     private JTextField portField;
+    private JLabel ipLabel;
+    private JButton refreshIpButton;
 
     public ServerGUI() {
         super("Election Server");
@@ -48,6 +54,14 @@ public class ServerGUI extends JFrame {
         portField = new JTextField("5000", 5);
         portPanel.add(new JLabel("Porta:"));
         portPanel.add(portField);
+        // label para exibir o IP local
+        ipLabel = new JLabel("IP: " + getLocalIpAddress());
+        portPanel.add(Box.createHorizontalStrut(12));
+        portPanel.add(ipLabel);
+        // botão para atualizar o IP à mão
+        refreshIpButton = new JButton("Atualizar IP");
+        refreshIpButton.addActionListener(ev -> ipLabel.setText("IP: " + getLocalIpAddress()));
+        portPanel.add(refreshIpButton);
 
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         newElectionButton = new JButton("Nova Eleição");
@@ -229,5 +243,29 @@ public class ServerGUI extends JFrame {
                 });
             }
         });
+    }
+
+    // procura um endereço IPv4 não-loopback nas interfaces ativas
+    private String getLocalIpAddress() {
+        try {
+            Enumeration<NetworkInterface> nets = NetworkInterface.getNetworkInterfaces();
+            while (nets.hasMoreElements()) {
+                NetworkInterface iface = nets.nextElement();
+                if (!iface.isUp() || iface.isLoopback()) continue;
+                Enumeration<InetAddress> addrs = iface.getInetAddresses();
+                while (addrs.hasMoreElements()) {
+                    InetAddress addr = addrs.nextElement();
+                    if (addr instanceof java.net.Inet4Address) {
+                        String ip = addr.getHostAddress();
+                        if (!"127.0.0.1".equals(ip)) return ip;
+                    }
+                }
+            }
+        } catch (SocketException ignored) {}
+        try {
+            return InetAddress.getLocalHost().getHostAddress();
+        } catch (Exception e) {
+            return "127.0.0.1";
+        }
     }
 }
